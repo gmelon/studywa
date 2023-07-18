@@ -6,9 +6,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 
 import java.util.List;
-import java.util.stream.Stream;
-
-import static java.util.stream.Collectors.groupingBy;
 
 public class UserAccount extends User {
 
@@ -18,8 +15,5 @@ public class UserAccount extends User {
     public UserAccount(Account account) {
         super(account.getNickname(), account.getPassword(), List.of(new SimpleGrantedAuthority("ROLE_USER")));
         this.account = account;
-
-        Stream.of(Integer.valueOf(1))
-                .collect(groupingBy())
     }
 }

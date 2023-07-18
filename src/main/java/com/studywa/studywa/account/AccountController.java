@@ -57,15 +57,43 @@ public class AccountController {
             return view;
         }
 
-        // 가입 완료 처리
-        account.completeSignUp();
-
-        // 로그인 처리
-        accountService.login(account);
+        accountService.completeSignUp(account);
 
         model.addAttribute("numberOfUser", accountRepository.count());
         model.addAttribute("nickname", account.getNickname());
         return view;
+    }
+
+    @GetMapping("/check-email")
+    public String checkEmail(@CurrentUser Account account, Model model) {
+        model.addAttribute("email", account.getEmail());
+
+        return "account/check-email";
+    }
+
+    @GetMapping("/resend-confirm-email")
+    public String resendConfirmEmail(@CurrentUser Account account, Model model) {
+        if (!account.canSendConfirmEmail()) {
+            model.addAttribute("email", account.getEmail());
+            model.addAttribute("error", "메일은 한 시간에 한 번만 전송할 수 있습니다.");
+            return "account/check-email";
+        }
+
+        accountService.sendSignupConfirmEmail(account.getId());
+        return "redirect:/";
+    }
+
+    @GetMapping("/profile/{nickname}")
+    public String viewProfile(@PathVariable String nickname, Model model, @CurrentUser Account account) {
+        Account accountByNickname = accountRepository.findByNickname(nickname);
+        if (accountByNickname == null) {
+            throw new IllegalArgumentException(nickname + "에 해당하는 사용자가 없습니다.");
+        }
+
+        model.addAttribute("account", accountByNickname);
+        model.addAttribute("isOwner", accountByNickname.equals(account));
+
+        return "account/profile";
     }
 
 }

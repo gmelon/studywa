@@ -30,6 +30,8 @@ public class Account {
 
     private String emailCheckToken;
 
+    private LocalDateTime emailCheckTokenGeneratedAt;
+
     // 인증이 된 시점을 기록
     private LocalDateTime joinedAt;
 
@@ -62,6 +64,11 @@ public class Account {
 
     public void generateEmailCheckToken() {
         this.emailCheckToken = UUID.randomUUID().toString();
+        emailCheckTokenGeneratedAt = LocalDateTime.now();
+    }
+
+    public boolean canSendConfirmEmail() {
+        return LocalDateTime.now().isAfter(emailCheckTokenGeneratedAt.plusHours(1));
     }
 
     public void completeSignUp() {
